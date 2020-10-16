@@ -14,7 +14,6 @@ from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
 import sys
-from alembic import op
 from helper_functions import get_venue_data
 #----------------------------------------------------------------------------#
 # App Config.
