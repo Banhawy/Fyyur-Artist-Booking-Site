@@ -3,6 +3,7 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-6">
+		<button type="submit" id="delete">Delete</button>
 		<h1 class="monospace">
 			{{ venue.name }}
 		</h1>
@@ -74,6 +75,12 @@
 		{% endfor %}
 	</div>
 </section>
-
+<script>
+	document.getElementById('delete').onclick = function(e) {
+		fetch('/venues/{{ venue.id }}', {
+			method: 'DELETE'
+		})
+	}
+</script>
 {% endblock %}
 
