@@ -10,19 +10,20 @@ from logging import FileHandler, Formatter
 
 import babel
 import dateutil.parser
-from flask import (Flask, Response, flash, redirect, render_template, request,
-                   url_for)
+from flask import (Flask, Response, flash, jsonify, redirect, render_template,
+                   request, url_for)
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import Form
-from forms import *
-from helper_functions import (error_logger, format_artist_data, seed_db,
-                              format_venue_page_data, get_venue_data,
-                              format_show_data, get_future_shows_count,
-                              get_past_shows_count, get_past_shows,
-                              get_upcoming_shows, format_artist_page_data)
 from sqlalchemy.dialects.postgresql import UUID
+
+from forms import *
+from helper_functions import (error_logger, format_artist_data,
+                              format_artist_page_data, format_show_data,
+                              format_venue_page_data, get_future_shows_count,
+                              get_past_shows, get_past_shows_count,
+                              get_upcoming_shows, get_venue_data, seed_db)
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -427,6 +428,8 @@ def search_artists():
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # DONE: replace with real venue data from the venues table, using venue_id
+
+  # Query all artists and return Artist list in JSON object to client requesting '/artists/all' endpoint
   if artist_id == 'all':
     error = False
     try:
@@ -436,9 +439,19 @@ def show_artist(artist_id):
       error = True
     finally:
       if error:
-        return False
+        return abort(400)
       else:
-        return request.json(artists)
+        body = {}
+        artists_list = []
+        body["artists_list"] = []
+        for artist in artists:
+          artist_obj = {
+            "artist_id": artist.id,
+            "artist_name": artist.name
+          }
+          artists_list.append(artist_obj)
+        body["artists_list"] = artists_list
+        return jsonify(body)
 
   # TODO: place inside try/catch block
   future_shows = get_upcoming_shows(db, Show, Venue, Artist, artist_id, 'artist')

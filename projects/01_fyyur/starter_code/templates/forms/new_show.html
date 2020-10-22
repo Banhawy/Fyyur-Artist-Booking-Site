@@ -22,10 +22,15 @@
     </form>
 
     <script>
-      fetch('artists/all').then(data => {
+      fetch('/artists/all').then(data => {
         return data.json()
       }).then(data => {
-        console.log(data)
+        let artists_list = data.artists_list
+        let select = document.getElementById("artist_id")
+        for(let item of artists_list) {
+          let option = new Option(item.artist_name, item.artist_id)
+          select.add(option)
+        }
       })
     </script>
   </div>
