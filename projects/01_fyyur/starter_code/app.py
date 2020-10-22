@@ -220,7 +220,7 @@ def show_venue(venue_id):
       future_shows = get_upcoming_shows(db, Show, Venue, Artist, venue_id, 'venue')
       future_shows_count = get_future_shows_count(db, Show, venue_id, 'venue')
       past_shows = get_past_shows(db, Show, Venue, Artist, venue_id, 'venue')
-      past_shows_count = get_past_shows_count(db, Show, Venue, venue_id, 'venue')
+      past_shows_count = get_past_shows_count(db, Show, venue_id, 'venue')
 
       venue = Venue.query.get(venue_id)
       venue_data = format_venue_page_data(venue, genre_dict, future_shows, future_shows_count, 
@@ -385,7 +385,7 @@ def show_artist(artist_id):
     future_shows = get_upcoming_shows(db, Show, Venue, Artist, artist_id, 'artist')
     future_shows_count = get_future_shows_count(db, Show, artist_id, 'artist')
     past_shows = get_past_shows(db, Show, Venue, Artist, artist_id, 'artist')
-    past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
+    past_shows_count = get_past_shows_count(db, Show, artist_id, 'artist')
 
     artist = Artist.query.get(artist_id)
     data = format_artist_page_data(artist, genre_dict, future_shows, future_shows_count, past_shows, past_shows_count)
