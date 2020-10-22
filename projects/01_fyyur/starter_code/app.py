@@ -221,8 +221,8 @@ def show_venue(venue_id):
       past_shows_count = get_past_shows_count(db, Show, Venue, venue_id, 'venue')
 
       venue = Venue.query.get(venue_id)
-      venue_data = format_venue_page_data(venue, future_shows, future_shows_count, 
-                              past_shows, past_shows_count, genre_dict)
+      venue_data = format_venue_page_data(venue, genre_dict, future_shows, future_shows_count, 
+                              past_shows, past_shows_count)
       return render_template('pages/show_venue.html', venue=venue_data)
     else:
       flash('Oops! An error occured while fetching the venue page')
@@ -454,31 +454,66 @@ def edit_artist_submission(artist_id):
     return redirect(url_for('show_artist', artist_id=artist_id))
 
 
-@app.route('/venues/<int:venue_id>/edit', methods=['GET'])
+@app.route('/venues/<venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   form = VenueForm()
-  venue={
-    "id": 1,
-    "name": "The Musical Hop",
-    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-    "address": "1015 Folsom Street",
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "123-123-1234",
-    "website": "https://www.themusicalhop.com",
-    "facebook_link": "https://www.facebook.com/TheMusicalHop",
-    "seeking_talent": True,
-    "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-    "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  }
-  # TODO: populate form with values from venue with ID <venue_id>
-  return render_template('forms/edit_venue.html', form=form, venue=venue)
+  # DONE: populate form with values from venue with ID <venue_id>
+  error = False
+  try:
+    venue_data = Venue.query.get(venue_id)
+    venue = format_venue_page_data(venue_data, genre_dict)
+  except Exception as e:
+    error_logger(e, 'Failed to editing venue ' + venue_id )
+    error = True
+  finally:
+    db.session.close()
+    if error:
+      flash('Could not fetch venue to edit')
+      return redirect(url_for('show_venue', venue_id=venue_id))
+    else:
+      return render_template('forms/edit_venue.html', form=form, venue=venue)
 
-@app.route('/venues/<int:venue_id>/edit', methods=['POST'])
+@app.route('/venues/<venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
+  # DONE: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-  return redirect(url_for('show_venue', venue_id=venue_id))
+  error = False
+  try:
+    venue = Venue.query.get(venue_id)
+    name = request.form['name']
+    state = request.form['state']
+    city = request.form['city']
+    phone = request.form['phone']
+    genres = request.form.getlist('genres')
+    facebook_link = request.form['facebook_link']
+    website = request.form['website']
+    seeking_description = request.form['seeking_description']
+    
+    venue.name = name
+    venue.state = state
+    venue.city = city
+    venue.phone = phone
+    venue.facebook_link = facebook_link
+    venue.website = website
+    if 'seeking_talent' in request.form:
+      venue.seeking_talent = True
+    else:
+      venue.seeking_talent = False
+    venue.seeking_description = seeking_description
+
+    db.session.commit()
+  except Exception as e:
+    error = True
+    error_logger(e, 'Error updating venue ' + venue_id)
+    db.session.rollback()
+  finally:
+    db.session.close()
+    if error:
+      message = 'Error updating Venue'
+    else:
+      message = 'Successfully updated Venue'
+    flash(message)
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
