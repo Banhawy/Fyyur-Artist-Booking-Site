@@ -282,13 +282,20 @@ def show_venue(venue_id):
   error = False
   try:
     venue = Venue.query.get(venue_id)
-    venue_data = format_venue_page_data(venue, genre_dict)
   except Exception as e:
     error_logger(e, 'Error fetching venue ' + venue_id)
     error = True
   finally:
     db.session.close()
     if not error:
+      future_shows = get_upcoming_shows(db, Show, Venue, venue_id, 'venue')
+      future_shows_count = get_future_shows_count(db, Show, venue_id, 'venue')
+      past_shows = get_past_shows(db, Show, Venue, Artist, venue_id, 'venue')
+      past_shows_count = get_past_shows_count(db, Show, Venue, venue_id, 'venue')
+
+      venue = Venue.query.get(venue_id)
+      venue_data = format_venue_page_data(venue, future_shows, future_shows_count, 
+                              past_shows, past_shows_count, genre_dict)
       return render_template('pages/show_venue.html', venue=venue_data)
     else:
       flash('Oops! An error occured while fetching the venue page')
@@ -503,10 +510,10 @@ def show_artist(artist_id):
         return False
       else:
         return request.json(artists)
-  future_shows = get_upcoming_shows(db, Show, Venue, artist_id)
-  future_shows_count = get_future_shows_count(db, Show, artist_id)
-  past_shows = get_past_shows(db, Show, Venue, artist_id)
-  past_shows_count = get_past_shows_count(db, Show, Venue, artist_id)
+  future_shows = get_upcoming_shows(db, Show, Venue, artist_id, 'artist')
+  future_shows_count = get_future_shows_count(db, Show, artist_id, 'artist')
+  past_shows = get_past_shows(db, Show, Venue, Artist, artist_id, 'artist')
+  past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
 
   artist = Artist.query.get(artist_id)
   data = format_artist_page_data(artist, future_shows, future_shows_count, 

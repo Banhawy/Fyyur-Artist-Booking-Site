@@ -166,7 +166,7 @@ def get_venue_data(venues_list):
           y['venues'].append({'id': x.id, 'name': x.name, 'upcoming_shows': 0})
   return data
 
-def format_venue_page_data(venue, genre_dict):
+def format_venue_page_data(venue, future_shows, future_shows_count, past_shows, past_shows_count, genre_dict):
   genre_list = []
   for venue_genre in venue.genres:
     genre_name = genre_dict[venue_genre.genre]
@@ -184,10 +184,10 @@ def format_venue_page_data(venue, genre_dict):
     "seeking_talent": venue.seeking_talent,
     "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
-    "past_shows": [],
-    "upcoming_shows": [],
-    "past_shows_count": 0,
-    "upcoming_shows_count": 0
+    "past_shows": past_shows,
+    "upcoming_shows": future_shows,
+    "past_shows_count": past_shows_count,
+    "upcoming_shows_count": future_shows_count
   }
   return venue_data
 
@@ -236,14 +236,20 @@ def format_show_data(joined_show_artist_venue_data):
     data.append(show_data)
   return data
 
-def get_future_shows_count(db, Show, artist_id):
+def get_future_shows_count(db, Show, id, id_type):
+  if id_type == 'artist':
+    show_id = Show.artist_id
+  elif id_type == 'venue':
+    show_id = Show.venue_id
+  else:
+    show_id = Show.artist_id
   current_date = datetime.today().isoformat()
-  # query retuns a tuple in the form (artist_id, future_show_count) 
+  # query retuns a tuple in the form (artist_id/venue_id, future_show_count) 
   # e.x. (u'fd407ea1-1253-11eb-b418-18a905365095', 3L)
-  filtered_query = db.session.query(Show.artist_id, func.count(Show.start_time))\
+  filtered_query = db.session.query(show_id, func.count(Show.start_time))\
                               .select_from(Show).filter(Show.start_time > current_date)\
-                              .filter(Show.artist_id == artist_id)\
-                              .group_by(Show.artist_id)\
+                              .filter(show_id == id)\
+                              .group_by(show_id)\
                               .first()
   if filtered_query is None: 
     count = 0 
@@ -256,61 +262,107 @@ def get_venue_name_image(db, Venue, venue_id):
   venue = Venue.query.get(venue_id)
   return (venue.name, venue.image_link)
 
-# Given an artist_id return a list of upcoming shows venue data
-def get_upcoming_shows(db, Show, Venue, artist_id):
+# Given an artist_id returns a tuple with artist name and artist image link
+def get_artist_name_image(db, Artist, artist_id):
+  artist = Artist.query.get(artist_id)
+  return (artist.name, artist.image_link)
+
+# Given an artist_id/venue_id return a list of upcoming shows venue data
+def get_upcoming_shows(db, Show, Venue, id, id_type):
   data = []
   current_date = datetime.today().isoformat()
+  if id_type == 'artist':
+    show_id = Show.artist_id
+  elif id_type == 'venue':
+    show_id = Show.venue_id
+  else:
+    show_id = Show.artist_id
   # get venue name & image_link
   upcoming_shows = Show.query.filter(Show.start_time > current_date)\
-                              .filter(Show.artist_id == artist_id)\
+                              .filter(show_id == id)\
                               .all()
   for show in upcoming_shows:
     start_time = show.start_time
-    venue_id = show.venue_id
-    venue_name, venue_image_link = get_venue_name_image(db, Venue, venue_id)
-    
-    venue_obj = {}
-    venue_obj["venue_id"] = venue_id
-    venue_obj["venue_name"] = venue_name
-    venue_obj["venue_image_link"] = venue_image_link
-    venue_obj["start_time"] = start_time
-    
-    data.append(venue_obj)
-  
+    if id_type == 'artist':
+      venue_id = show.venue_id
+      venue_name, venue_image_link = get_venue_name_image(db, Venue, venue_id)
+      
+      venue_obj = {}
+      venue_obj["venue_id"] = venue_id
+      venue_obj["venue_name"] = venue_name
+      venue_obj["venue_image_link"] = venue_image_link
+      venue_obj["start_time"] = start_time
+
+    elif id_type == 'venue':
+      artist_id = show.artist_id
+      artist_name, artist_image_link = get_artist_name_image(db, Artist, artist_id)
+      
+      artist_obj = {}
+      artist_obj["artist_id"] = artist_id
+      artist_obj["artist_name"] = artist_name
+      artist_obj["artist_image_link"] = artist_image_link
+      artist_obj["start_time"] = start_time
+      data.append(artist_obj)
+
   return data
 
 # Given an artist_id return a list of past shows venue data
-def get_past_shows(db, Show, Venue, artist_id):
+def get_past_shows(db, Show, Venue, Artist, id, id_type):
   data = []
   current_date = datetime.today().isoformat()
+  if id_type == 'artist':
+    show_id = Show.artist_id
+  elif id_type == 'venue':
+    show_id = Show.venue_id
+  else:
+    show_id = Show.artist_id
   # get venue name & image_link
   past_shows = Show.query.filter(Show.start_time < current_date)\
-                              .filter(Show.artist_id == artist_id)\
+                              .filter(show_id == id)\
                               .all()
   for show in past_shows:
     start_time = show.start_time
-    venue_id = show.venue_id
-    venue_name, venue_image_link = get_venue_name_image(db, Venue, venue_id)
+    if id_type == 'artist':
+      venue_id = show.venue_id
+      venue_name, venue_image_link = get_venue_name_image(db, Venue, venue_id)
+      
+      venue_obj = {}
+      venue_obj["venue_id"] = venue_id
+      venue_obj["venue_name"] = venue_name
+      venue_obj["venue_image_link"] = venue_image_link
+      venue_obj["start_time"] = start_time
+      
+      data.append(venue_obj)
+    elif id_type == 'venue':
+      artist_id = show.artist_id
+      artist_name, artist_image_link = get_artist_name_image(db, Artist, artist_id)
+      
+      artist_obj = {}
+      artist_obj["artist_id"] = artist_id
+      artist_obj["artist_name"] = artist_name
+      artist_obj["artist_image_link"] = artist_image_link
+      artist_obj["start_time"] = start_time
+      
+      data.append(artist_obj)
     
-    venue_obj = {}
-    venue_obj["venue_id"] = venue_id
-    venue_obj["venue_name"] = venue_name
-    venue_obj["venue_image_link"] = venue_image_link
-    venue_obj["start_time"] = start_time
-    
-    data.append(venue_obj)
-  
   return data
 
-def get_past_shows_count(db, Show, Venue, artist_id):
+def get_past_shows_count(db, Show, Venue, id, id_type):
   current_date = datetime.today().isoformat()
+  if id_type == 'artist':
+    show_id = Show.artist_id
+  elif id_type == 'venue':
+    show_id = Show.venue_id
+  else:
+    show_id = Show.artist_id
+
   # query retuns a tuple in the form (artist_id, past_show_count) 
   # e.x. (u'fd407ea1-1253-11eb-b418-18a905365095', 3L)
-  filtered_query = db.session.query(Show.artist_id, func.count(Show.start_time))\
+  filtered_query = db.session.query(show_id, func.count(Show.start_time))\
                               .select_from(Show)\
                               .filter(Show.start_time < current_date)\
-                              .filter(Show.artist_id == artist_id)\
-                              .group_by(Show.artist_id)\
+                              .filter(show_id == id)\
+                              .group_by(show_id)\
                               .first()
   if filtered_query is None: 
     count = 0 
