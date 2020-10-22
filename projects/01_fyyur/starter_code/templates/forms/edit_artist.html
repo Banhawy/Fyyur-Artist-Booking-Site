@@ -31,7 +31,20 @@
       <div class="form-group">
           <label for="genres">Facebook Link</label>
           {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
-        </div>
+      </div>
+      <div class="form-group">
+          <label for="website">Website Link</label>
+          {{ form.website(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+      </div>
+      <div>
+        <label for="seeking-venue">Seeking Venue:</label>
+        {{ form.seeking_venue(class_ = 'form-control', autofocus = true) }}
+      </div>
+      <div>
+        <label for="seeking-description">Seeking venue description:</label>
+        {{ form.seeking_description(class_ = 'form-control', autofocus = true) }}
+      </div>
+      <br>
       <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
@@ -41,7 +54,9 @@
     document.getElementById('city').value = '{{ artist.city }}'
     document.getElementById('state').value = '{{ artist.state }}'
     document.getElementById('phone').value = '{{ artist.phone }}'
-    document.getElementById('phone').value = '{{ artist.phone }}'
+    document.getElementById('facebook_link').value = '{{ artist.facebook_link }}'
+    document.getElementById('website').value = '{{ artist.website }}'
+    // Set selected genre
     let genres = document.getElementById('genres')
     let recievedGenres = {{ artist.genres|tojson }}
     let options = [...genres.options]
@@ -54,5 +69,11 @@
         }
       }
     }
+    // Set seeking venue checkbox
+    let True = true
+    let False = false
+    let seeking_venue_value = {{ artist.seeking_venue }}
+    document.getElementById('seeking_venue').checked = seeking_venue_value
+    document.getElementById('seeking_description').value = '{{ artist.seeking_description }}'
   </script>
 {% endblock %}
