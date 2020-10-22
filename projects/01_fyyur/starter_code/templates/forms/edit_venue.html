@@ -1,12 +1,12 @@
 {% extends 'layouts/main.html' %}
-{% block title %}Edit Venue{% endblock %}
+{% block title %}Edit venue{% endblock %}
 {% block content %}
   <div class="form-wrapper">
     <form class="form" method="post" action="/venues/{{venue.id}}/edit">
-      <h3 class="form-heading">Edit venue <em>{{ venue.name }}</em> <a href="{{ url_for('index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
+      <h3 class="form-heading">Edit venue <em>{{ venue.name }}</em></h3>
       <div class="form-group">
         <label for="name">Name</label>
-        {{ form.name(class_ = 'form-control', autofocus = true) }}
+        {{ form.name(class_ = 'form-control', value=venue.name, autofocus = true) }}
       </div>
       <div class="form-group">
           <label>City & State</label>
@@ -20,23 +20,60 @@
           </div>
       </div>
       <div class="form-group">
-        <label for="address">Address</label>
-        {{ form.address(class_ = 'form-control', autofocus = true) }}
-      </div>
-      <div class="form-group">
           <label for="phone">Phone</label>
           {{ form.phone(class_ = 'form-control', placeholder='xxx-xxx-xxxx', autofocus = true) }}
         </div>
       <div class="form-group">
         <label for="genres">Genres</label>
         <small>Ctrl+Click to select multiple</small>
-        {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', id=form.state, autofocus = true) }}
+        {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', autofocus=true) }}
       </div>
       <div class="form-group">
           <label for="genres">Facebook Link</label>
-          {{ form.facebook_link(class_ = 'form-control', placeholder='http://', id=form.state, autofocus = true) }}
-        </div>
-      <input type="submit" value="Edit Venue" class="btn btn-primary btn-lg btn-block">
+          {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+      </div>
+      <div class="form-group">
+          <label for="website">Website Link</label>
+          {{ form.website(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+      </div>
+      <div>
+        <label for="seeking-venue">Seeking Venue:</label>
+        {{ form.seeking_talent(class_ = 'form-control', autofocus = true) }}
+      </div>
+      <div>
+        <label for="seeking-description">Seeking venue description:</label>
+        {{ form.seeking_description(class_ = 'form-control', autofocus = true) }}
+      </div>
+      <br>
+      <input type="submit" value="Edit venue" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
+  <script>
+    // Set recieved venue values in input elemnts on page 
+    document.getElementById('name').value = '{{ venue.name }}'
+    document.getElementById('city').value = '{{ venue.city }}'
+    document.getElementById('state').value = '{{ venue.state }}'
+    document.getElementById('phone').value = '{{ venue.phone }}'
+    document.getElementById('facebook_link').value = '{{ venue.facebook_link }}'
+    document.getElementById('website').value = '{{ venue.website }}'
+    // Set selected genre
+    let genres = document.getElementById('genres')
+    let recievedGenres = {{ venue.genres|tojson }}
+    let options = [...genres.options]
+    for(let i=0; i < recievedGenres.length; i++){
+      let genreName = recievedGenres[i]
+      for (let j=0; j < options.length; j++) {
+        let option = options[j]
+        if (option.value == genreName) {
+          option.selected = true
+        }
+      }
+    }
+    // Set seeking venue checkbox
+    let True = true
+    let False = false
+    let seeking_talent_value = {{ venue.seeking_talent }}
+    document.getElementById('seeking_talent').checked = seeking_talent_value
+    document.getElementById('seeking_description').value = '{{ venue.seeking_description }}'
+  </script>
 {% endblock %}
