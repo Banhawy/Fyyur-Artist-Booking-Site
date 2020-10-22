@@ -11,9 +11,10 @@ def error_logger(e, message):
     print(e.message)
   print(message)
 
+# Given an sql result data and type, return the required structured data to render on search results
 def search_results_format(db, Show, data, type):
   data_list_length = len(data)
-  print('hoiii')
+
   if data_list_length == 0:
     return { "count": 0, "data": [] }
   
@@ -63,6 +64,7 @@ def generate_artist_genres(Artist_Genre, genre_dict, artist_id, genre_list):
     artist_genres.append(artist_genre)
   return artist_genres
 
+# Seeds app database with data identical to mock data initially started with
 def seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict):
   #  Genres
   #  ----------------------------------------------------------------
@@ -194,6 +196,7 @@ def get_venue_data(venues_list):
           y['venues'].append({'id': x.id, 'name': x.name, 'upcoming_shows': 0})
   return data
 
+# Given a Venue object and genre dictionary, return the required data structure to render on venue page
 def format_venue_page_data(venue, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
   genre_list = []
   for venue_genre in venue.genres:
@@ -219,6 +222,7 @@ def format_venue_page_data(venue, genre_dict, future_shows=[], future_shows_coun
   }
   return venue_data
 
+# Given a list of artist query result, return the required data structure to render on /artists page
 def format_artist_data(artists):
   data = []
   for artist_tuple in artists:
@@ -229,6 +233,7 @@ def format_artist_data(artists):
     data.append(artist_object)
   return data
 
+# Given an artist and genre dictionary, return the required data structure to render on artist page
 def format_artist_page_data(artist, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
   data = {}
   genre_list = []
@@ -377,7 +382,8 @@ def get_past_shows(db, Show, Venue, Artist, id, id_type):
     
   return data
 
-def get_past_shows_count(db, Show, Venue, id, id_type):
+# Given an artist or venue id, get its past shows count
+def get_past_shows_count(db, Show, id, id_type):
   current_date = datetime.today().isoformat()
   if id_type == 'artist':
     show_id = Show.artist_id
