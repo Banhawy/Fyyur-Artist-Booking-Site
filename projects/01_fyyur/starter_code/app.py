@@ -399,7 +399,6 @@ def edit_artist(artist_id):
   try:
     artist_data = Artist.query.get(artist_id)
     artist = format_artist_page_data(artist_data, genre_dict)
-    print('uoii')
   except Exception as e:
     error_logger(e, 'Failed to editing artist ' + artist_id )
     error = True
@@ -412,12 +411,48 @@ def edit_artist(artist_id):
       return render_template('forms/edit_artist.html', form=form, artist=artist)
       
 
-@app.route('/artists/<int:artist_id>/edit', methods=['POST'])
+@app.route('/artists/<artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
+  # DONE: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
+  error = False
+  try:
+    artist = Artist.query.get(artist_id)
+    name = request.form['name']
+    state = request.form['state']
+    city = request.form['city']
+    phone = request.form['phone']
+    genres = request.form.getlist('genres')
+    facebook_link = request.form['facebook_link']
+    website = request.form['website']
+    seeking_description = request.form['seeking_description']
+    
+    artist.name = name
+    artist.state = state
+    artist.city = city
+    artist.phone = phone
+    artist.facebook_linke = facebook_link
+    artist.website = website
+    if 'seeking_venue' in request.form:
+      artist.seeking_venue = True
+    else:
+      artist.seeking_venue = False
+    artist.seeking_description = seeking_description
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
+    db.session.commit()
+  except Exception as e:
+    error = True
+    error_logger(e, 'Error updating artist ' + artist_id)
+    db.session.rollback()
+  finally:
+    db.session.close()
+    if error:
+      message = 'Error updating Artist'
+    else:
+      message = 'Successfully updated Artist'
+    flash(message)
+    return redirect(url_for('show_artist', artist_id=artist_id))
+
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
