@@ -201,7 +201,7 @@ def format_artist_data(artists):
     data.append(artist_object)
   return data
 
-def format_artist_page_data(artist, future_shows, future_shows_count, past_shows, past_shows_count, genre_dict):
+def format_artist_page_data(artist, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
   data = {}
   genre_list = []
   for genre in artist.genres:
