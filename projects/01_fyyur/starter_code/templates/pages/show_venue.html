@@ -3,7 +3,14 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-6">
-		<button type="submit" id="delete">Delete</button>
+		<div class="row">
+			<div class="col-sm-2">
+				<button type="submit" id="delete">Delete</button>
+			</div>
+			<div class="col-sm-2">
+				<button type="submit" id="edit">edit</button>
+			</div>
+		</div>
 		<h1 class="monospace">
 			{{ venue.name }}
 		</h1>
@@ -76,6 +83,8 @@
 	</div>
 </section>
 <script>
+	document.getElementById('edit').onclick =  function() { location.pathname = 'venues/{{ venue.id }}/edit' }
+
 	document.getElementById('delete').onclick = function(e) {
 		fetch('/venues/{{ venue.id }}', {
 			method: 'DELETE'
