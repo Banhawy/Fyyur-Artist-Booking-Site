@@ -381,16 +381,20 @@ def show_artist(artist_id):
         body["artists_list"] = artists_list
         return jsonify(body)
 
-  # TODO: place inside try/catch block
-  future_shows = get_upcoming_shows(db, Show, Venue, Artist, artist_id, 'artist')
-  future_shows_count = get_future_shows_count(db, Show, artist_id, 'artist')
-  past_shows = get_past_shows(db, Show, Venue, Artist, artist_id, 'artist')
-  past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
+  try:
+    future_shows = get_upcoming_shows(db, Show, Venue, Artist, artist_id, 'artist')
+    future_shows_count = get_future_shows_count(db, Show, artist_id, 'artist')
+    past_shows = get_past_shows(db, Show, Venue, Artist, artist_id, 'artist')
+    past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
 
-  artist = Artist.query.get(artist_id)
-  data = format_artist_page_data(artist, genre_dict, future_shows, future_shows_count, past_shows, past_shows_count)
+    artist = Artist.query.get(artist_id)
+    data = format_artist_page_data(artist, genre_dict, future_shows, future_shows_count, past_shows, past_shows_count)
+    return render_template('pages/show_artist.html', artist=data)
+  except Exception as e:
+    error_logger(e, 'Error fetching artist data')
+    flash('Error fetching artist data')
+    return render_template('pages/home.html')
 
-  return render_template('pages/show_artist.html', artist=data)
 
 #  Update
 #  ----------------------------------------------------------------
