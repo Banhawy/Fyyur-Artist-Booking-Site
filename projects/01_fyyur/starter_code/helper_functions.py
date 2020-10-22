@@ -268,7 +268,7 @@ def get_artist_name_image(db, Artist, artist_id):
   return (artist.name, artist.image_link)
 
 # Given an artist_id/venue_id return a list of upcoming shows venue data
-def get_upcoming_shows(db, Show, Venue, id, id_type):
+def get_upcoming_shows(db, Show, Venue, Artist, id, id_type):
   data = []
   current_date = datetime.today().isoformat()
   if id_type == 'artist':
@@ -292,6 +292,7 @@ def get_upcoming_shows(db, Show, Venue, id, id_type):
       venue_obj["venue_name"] = venue_name
       venue_obj["venue_image_link"] = venue_image_link
       venue_obj["start_time"] = start_time
+      data.append(venue_obj)
 
     elif id_type == 'venue':
       artist_id = show.artist_id

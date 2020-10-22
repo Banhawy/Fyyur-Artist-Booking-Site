@@ -288,7 +288,7 @@ def show_venue(venue_id):
   finally:
     db.session.close()
     if not error:
-      future_shows = get_upcoming_shows(db, Show, Venue, venue_id, 'venue')
+      future_shows = get_upcoming_shows(db, Show, Venue, Artist, venue_id, 'venue')
       future_shows_count = get_future_shows_count(db, Show, venue_id, 'venue')
       past_shows = get_past_shows(db, Show, Venue, Artist, venue_id, 'venue')
       past_shows_count = get_past_shows_count(db, Show, Venue, venue_id, 'venue')
@@ -510,7 +510,7 @@ def show_artist(artist_id):
         return False
       else:
         return request.json(artists)
-  future_shows = get_upcoming_shows(db, Show, Venue, artist_id, 'artist')
+  future_shows = get_upcoming_shows(db, Show, Venue, Artist, artist_id, 'artist')
   future_shows_count = get_future_shows_count(db, Show, artist_id, 'artist')
   past_shows = get_past_shows(db, Show, Venue, Artist, artist_id, 'artist')
   past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
