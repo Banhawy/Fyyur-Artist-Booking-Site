@@ -3,6 +3,7 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-6">
+		<button type="submit" id="edit">edit</button>
 		<h1 class="monospace">
 			{{ artist.name }}
 		</h1>
@@ -71,6 +72,8 @@
 		{% endfor %}
 	</div>
 </section>
-
+<script>
+	document.getElementById('edit').onclick =  function() { location.pathname = 'artists/{{ artist.id }}/edit' }
+</script>
 {% endblock %}
 
