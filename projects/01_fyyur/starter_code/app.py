@@ -22,7 +22,7 @@ from forms import *
 from helper_functions import (error_logger, format_artist_data,
                               format_artist_page_data, format_show_data,
                               format_venue_page_data, get_future_shows_count,
-                              get_past_shows, get_past_shows_count,
+                              get_past_shows, get_past_shows_count, search_results_format,
                               get_upcoming_shows, get_venue_data, seed_db)
 
 #----------------------------------------------------------------------------#
@@ -164,18 +164,20 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+  # DONE: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }
-  return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
+  search_term = request.form.get('search_term', '')
+  try:
+    search_query = Venue.query.filter(Venue.name.ilike('%' + search_term + '%')).all()
+    result_data = search_results_format(db, Show, search_query, 'venue')
+    db.session.close()
+    return render_template('pages/search_venues.html', results=result_data, search_term=search_term)
+  except Exception as e:
+    error_logger(e, 'Error searching venue')
+    flash('Error searching venue')
+    return render_template('pages/search_venues.html', results={}, search_term=search_term)
+    
 
 @app.route('/venues/<string:venue_id>')
 def show_venue(venue_id):
@@ -295,7 +297,7 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
+  # DONE: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
   error = False
   try:
@@ -336,18 +338,19 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+  # DONE: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
-  }
-  return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+  search_term = request.form.get('search_term', '')
+  try:
+    search_query = Artist.query.filter(Artist.name.ilike('%' + search_term + '%')).all()
+    result_data = search_results_format(db, Show, search_query, 'artist')
+    db.session.close()
+    return render_template('pages/search_artists.html', results=result_data, search_term=search_term)
+  except Exception as e:
+    error_logger(e, 'Error searching artist')
+    flash('Error searching artist')
+    return render_template('pages/search_artists.html', results={}, search_term=search_term)
 
 @app.route('/artists/<string:artist_id>')
 def show_artist(artist_id):

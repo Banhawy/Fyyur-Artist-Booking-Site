@@ -11,6 +11,34 @@ def error_logger(e, message):
     print(e.message)
   print(message)
 
+def search_results_format(db, Show, data, type):
+  data_list_length = len(data)
+  print('hoiii')
+  if data_list_length == 0:
+    return { "count": 0, "data": [] }
+  
+  result_data = []
+  if type == 'venue':
+    for venue in data:
+      venue_obj = {}
+      venue_obj["id"] = venue.id
+      venue_obj["name"] = venue.name
+      venue_obj["num_upcoming_shows"] = get_future_shows_count(db, Show, venue.id, 'venue')
+      result_data.append(venue_obj)
+
+  elif type == 'artist':
+    for artist in data:
+      artist_obj = {}
+      artist_obj["id"] = artist.id
+      artist_obj["name"] = artist.name
+      artist_obj["num_upcoming_shows"] = get_future_shows_count(db, Show, artist.id, 'artist')
+      result_data.append(artist_obj)
+
+  result_object = {}
+  result_object["count"] = data_list_length
+  result_object["data"] = result_data
+  return result_object
+
 # Return a list of Venue_Genres
 def generate_venue_genres(Venue_Genre, genre_dict, venue_id, genre_list):
   venue_genres = []
