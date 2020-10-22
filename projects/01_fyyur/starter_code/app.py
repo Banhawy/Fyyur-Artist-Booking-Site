@@ -17,7 +17,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import Form
 from forms import *
-from helper_functions import (error_logger, format_artist_data,
+from helper_functions import (error_logger, format_artist_data, seed_db,
                               format_venue_page_data, get_venue_data,
                               format_show_data, get_future_shows_count,
                               get_past_shows_count, get_past_shows,
@@ -109,26 +109,16 @@ class Artist_Genre(db.Model):
   artist_id = db.Column(db.String, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
   genre = db.Column(db.Integer, db.ForeignKey('genre.id'), primary_key=True)
   
-# Seed Genres table in db
-genres = ['Jazz', 'Classical', 'Reggae', 'Alternative', 'Country', 'Electronic', 'Folk', 'Funk', 'Soul', 'Hip-Hop', 'Heavy Metal', 'Instrumental', 'Musical Theatre', 'Pop', 'Punk', 'Blues', 'R&B', 'Rock n Roll', 'Other']
-for genre in genres:
-  query_count = Genre.query.filter_by(name=genre).count()
-  if query_count == False:
-    try:
-      new_genre = Genre(name=genre)
-      db.session.add(new_genre)
-      db.session.commit()
-    except Exception as e:
-      error_logger(e, 'Error in genre seeding')
-      db.session.rollback()
-    finally:
-      db.session.close()
 
 # Get all genres from db and store in dict with corresponding id for fast retreival
 genre_dict = {}
 stored_genres = Genre.query.all()
 for genre in stored_genres:
   genre_dict[genre.id] = genre.name
+
+# SEED DB
+seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict)
+
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
