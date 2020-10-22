@@ -299,7 +299,8 @@ def delete_venue(venue_id):
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
   error = False
   try:
-    venue_to_delete = Venue.query.get(venue_id)
+    Venue.query.filter_by(id=venue_id).delete()
+    db.session.commit()
   except Exception as e:
     error_logger(e, 'Error in venue deletion')
     error = True
@@ -307,13 +308,11 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
     if error:
-      message = 'Error! Could not delete venue'
+      return jsonify({ 'success': False })
     else:
-      message = 'Successfully deleted venue.'
-    flash(message)
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-    return redirect(url_for('index'))
+      return jsonify({ 'success': True })
+    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+    # clicking that button delete it from the db then redirect the user to the homepage
 
 #  Artists
 #  ----------------------------------------------------------------
