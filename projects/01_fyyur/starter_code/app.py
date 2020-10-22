@@ -386,31 +386,31 @@ def show_artist(artist_id):
   past_shows_count = get_past_shows_count(db, Show, Venue, artist_id, 'artist')
 
   artist = Artist.query.get(artist_id)
-  data = format_artist_page_data(artist, future_shows, future_shows_count, 
-                          past_shows, past_shows_count, genre_dict)
+  data = format_artist_page_data(artist, genre_dict, future_shows, future_shows_count, past_shows, past_shows_count)
 
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
 #  ----------------------------------------------------------------
-@app.route('/artists/<int:artist_id>/edit', methods=['GET'])
+@app.route('/artists/<artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
-  # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=artist)
+  error = False
+  try:
+    artist_data = Artist.query.get(artist_id)
+    artist = format_artist_page_data(artist_data, genre_dict)
+    print('uoii')
+  except Exception as e:
+    error_logger(e, 'Failed to editing artist ' + artist_id )
+    error = True
+  finally:
+    db.session.close()
+    if error:
+      return redirect(url_for('show_artist', artist_id=artist_id))
+    else:
+      # DONE: populate form with fields from artist with ID <artist_id>
+      return render_template('forms/edit_artist.html', form=form, artist=artist)
+      
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
