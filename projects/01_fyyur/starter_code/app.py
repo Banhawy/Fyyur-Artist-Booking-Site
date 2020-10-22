@@ -51,7 +51,7 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500), default='https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60')
     facebook_link = db.Column(db.String(120))
-    # Done: implement any missing fields, as a database migration using Flask-Migrate
+    # DONE: implement any missing fields, as a database migration using Flask-Migrate
     website= db.Column(db.String(120), default='www.example.com')
     seeking_talent = db.Column(db.Boolean,  nullable=False, default=False)
     seeking_description = db.Column(db.String(500))
@@ -71,7 +71,7 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500), default='https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80')
     facebook_link = db.Column(db.String(120))
-    # Done: implement any missing fields, as a database migration using Flask-Migrate
+    # DONE: implement any missing fields, as a database migration using Flask-Migrate
     website = db.Column(db.String(500), default='www.example.com')
     seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String(500))
@@ -80,7 +80,7 @@ class Artist(db.Model):
     def __repr__(self):
       return '<Artist ' + str(self.id) + ' ' + self.name + '>'
     
-# Done Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+# DONE Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
   __tablename__ = 'show'
   
@@ -151,7 +151,7 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # Done: replace with real venues data.
+  # DONE: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[{
     "city": "San Francisco",
@@ -260,8 +260,8 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # Done: insert form data as a new Venue record in the db, instead
-  # Done: modify data to be the data object returned from db insertion
+  # DONE: insert form data as a new Venue record in the db, instead
+  # DONE: modify data to be the data object returned from db insertion
   error = False
   try:
     name = request.form['name']
@@ -308,7 +308,7 @@ def create_venue_submission():
     else:
       message = 'Venue ' + request.form['name'] + ' was successfully listed!'
     flash(message)
-    # Done: on unsuccessful db insert, flash an error instead.
+    # DONE: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     return render_template('pages/home.html')
@@ -340,7 +340,7 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # Done: replace with real data returned from querying the database
+  # DONE: replace with real data returned from querying the database
   error = False
   try:
     artists = Artist.query.add_columns('id', 'name').all()
@@ -477,7 +477,7 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  # Done: modify data to be the data object returned from db insertion
+  # DONE: modify data to be the data object returned from db insertion
   error = False
   try:
     name = request.form['name']
@@ -521,7 +521,7 @@ def create_artist_submission():
       message = 'There was an error listing Artist'
     else:
       message = 'Artist ' + name + ' was successfully listed!'
-  # Done: on unsuccessful db insert, flash an error instead.
+  # DONE: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
   flash(message)
   return render_template('pages/home.html')
