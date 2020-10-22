@@ -166,7 +166,7 @@ def get_venue_data(venues_list):
           y['venues'].append({'id': x.id, 'name': x.name, 'upcoming_shows': 0})
   return data
 
-def format_venue_page_data(venue, future_shows, future_shows_count, past_shows, past_shows_count, genre_dict):
+def format_venue_page_data(venue, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
   genre_list = []
   for venue_genre in venue.genres:
     genre_name = genre_dict[venue_genre.genre]
