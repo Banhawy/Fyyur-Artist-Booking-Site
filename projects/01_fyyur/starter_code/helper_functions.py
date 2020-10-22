@@ -214,6 +214,7 @@ def format_artist_page_data(artist, future_shows, future_shows_count, past_shows
   data["state"] = artist.state
   data["phone"] = artist.phone
   data["seeking_venue"] = artist.seeking_venue
+  data["seeking_description"] = artist.seeking_description
   data["image_link"] = artist.image_link
   data["past_shows"] = past_shows
   data["upcoming_shows"] = future_shows
