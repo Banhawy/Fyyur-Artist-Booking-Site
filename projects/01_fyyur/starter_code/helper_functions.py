@@ -213,6 +213,7 @@ def format_artist_page_data(artist, genre_dict, future_shows=[], future_shows_co
   data["city"] = artist.city
   data["state"] = artist.state
   data["phone"] = artist.phone
+  data["facebook_link"] = artist.facebook_link
   data["seeking_venue"] = artist.seeking_venue
   data["seeking_description"] = artist.seeking_description
   data["image_link"] = artist.image_link
