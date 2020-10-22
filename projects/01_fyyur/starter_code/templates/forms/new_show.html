@@ -32,6 +32,17 @@
           select.add(option)
         }
       })
+
+      fetch('/venues/all').then(data => {
+        return data.json()
+      }).then(data => {
+        let venues_list = data.venues_list
+        let select = document.getElementById("venue_id")
+        for(let item of venues_list) {
+          let option = new Option(item.venue_name, item.venue_id)
+          select.add(option)
+        }
+      })
     </script>
   </div>
 {% endblock %}

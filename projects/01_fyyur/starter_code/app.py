@@ -203,6 +203,30 @@ def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # DONE: replace with real venue data from the venues table, using venue_id
   # data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+   # Query all artists and return Artist list in JSON object to client requesting '/artists/all' endpoint
+  if venue_id == 'all':
+    error = False
+    try:
+      venues = Venue.query.all()
+    except Exception as e:
+      error_logger(e, 'Error fetching venues for select options')
+      error = True
+    finally:
+      if error:
+        return abort(400)
+      else:
+        body = {}
+        venues_list = []
+        body["venues_list"] = []
+        for venue in venues:
+          venue_obj = {
+            "venue_id": venue.id,
+            "venue_name": venue.name
+          }
+          venues_list.append(venue_obj)
+        body["venues_list"] = venues_list
+        return jsonify(body)
+
   error = False
   try:
     venue = Venue.query.get(venue_id)
