@@ -64,8 +64,16 @@ def generate_artist_genres(Artist_Genre, genre_dict, artist_id, genre_list):
     artist_genres.append(artist_genre)
   return artist_genres
 
+def get_genre_dict(db, Genre):
+  genre_dict = {}
+  stored_genres = Genre.query.all()
+  for genre in stored_genres:
+    genre_dict[genre.id] = genre.name
+  return genre_dict
+  
 # Seeds app database with data identical to mock data initially started with
-def seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict):
+def seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre):
+  genre_dict = {}
   #  Genres
   #  ----------------------------------------------------------------
   # Seed Genres table
@@ -198,7 +206,8 @@ def get_venue_data(venues_list):
   return data
 
 # Given a Venue object and genre dictionary, return the required data structure to render on venue page
-def format_venue_page_data(venue, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
+def format_venue_page_data(db, Genre, venue, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
+  genre_dict = get_genre_dict(db, Genre)
   genre_list = []
   for venue_genre in venue.genres:
     genre_name = genre_dict[venue_genre.genre]
@@ -235,8 +244,9 @@ def format_artist_data(artists):
   return data
 
 # Given an artist and genre dictionary, return the required data structure to render on artist page
-def format_artist_page_data(artist, genre_dict, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
+def format_artist_page_data(db, Genre, artist, future_shows=[], future_shows_count=0, past_shows=[], past_shows_count=0):
   data = {}
+  genre_dict = get_genre_dict(db, Genre)
   genre_list = []
   for genre in artist.genres:
     genre_name = genre_dict[genre.genre]

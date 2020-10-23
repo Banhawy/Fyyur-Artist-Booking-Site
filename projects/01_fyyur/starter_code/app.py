@@ -110,17 +110,6 @@ class Artist_Genre(db.Model):
   artist_id = db.Column(db.String, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
   genre = db.Column(db.Integer, db.ForeignKey('genre.id'), primary_key=True)
   
-genre_dict = {}
-
-# SEED DB
-seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict)
-
-# Get all genres from db and store in dict with corresponding id for fast retreival
-stored_genres = Genre.query.all()
-for genre in stored_genres:
-  genre_dict[genre.id] = genre.name
-
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -224,7 +213,7 @@ def show_venue(venue_id):
       past_shows_count = get_past_shows_count(db, Show, venue_id, 'venue')
 
       venue = Venue.query.get(venue_id)
-      venue_data = format_venue_page_data(venue, genre_dict, future_shows, future_shows_count, 
+      venue_data = format_venue_page_data(db, Genre, venue, future_shows, future_shows_count, 
                               past_shows, past_shows_count)
       return render_template('pages/show_venue.html', venue=venue_data)
     else:
@@ -389,7 +378,7 @@ def show_artist(artist_id):
     past_shows_count = get_past_shows_count(db, Show, artist_id, 'artist')
 
     artist = Artist.query.get(artist_id)
-    data = format_artist_page_data(artist, genre_dict, future_shows, future_shows_count, past_shows, past_shows_count)
+    data = format_artist_page_data(db, Genre, artist, future_shows, future_shows_count, past_shows, past_shows_count)
     return render_template('pages/show_artist.html', artist=data)
   except Exception as e:
     error_logger(e, 'Error fetching artist data')
@@ -405,7 +394,7 @@ def edit_artist(artist_id):
   error = False
   try:
     artist_data = Artist.query.get(artist_id)
-    artist = format_artist_page_data(artist_data, genre_dict)
+    artist = format_artist_page_data(db, Genre, artist_data)
   except Exception as e:
     error_logger(e, 'Failed to editing artist ' + artist_id )
     error = True
@@ -468,7 +457,7 @@ def edit_venue(venue_id):
   error = False
   try:
     venue_data = Venue.query.get(venue_id)
-    venue = format_venue_page_data(venue_data, genre_dict)
+    venue = format_venue_page_data(db, Genre, venue_data)
   except Exception as e:
     error_logger(e, 'Failed to editing venue ' + venue_id )
     error = True
