@@ -110,15 +110,16 @@ class Artist_Genre(db.Model):
   artist_id = db.Column(db.String, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
   genre = db.Column(db.Integer, db.ForeignKey('genre.id'), primary_key=True)
   
+genre_dict = {}
+
+# SEED DB
+seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict)
 
 # Get all genres from db and store in dict with corresponding id for fast retreival
-genre_dict = {}
 stored_genres = Genre.query.all()
 for genre in stored_genres:
   genre_dict[genre.id] = genre.name
 
-# SEED DB
-seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dict)
 
 #----------------------------------------------------------------------------#
 # Filters.

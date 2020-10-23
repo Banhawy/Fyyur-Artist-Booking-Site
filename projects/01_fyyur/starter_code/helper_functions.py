@@ -70,17 +70,18 @@ def seed_db(db, Artist, Venue, Show, Genre, Venue_Genre, Artist_Genre, genre_dic
   #  ----------------------------------------------------------------
   # Seed Genres table
   genres = ['Jazz', 'Classical', 'Reggae', 'Alternative', 'Country', 'Electronic', 'Folk', 'Funk', 'Soul', 'Hip-Hop', 'Heavy Metal', 'Instrumental', 'Musical Theatre', 'Pop', 'Punk', 'Blues', 'R&B', 'Rock n Roll', 'Other']
-  for genre in genres:
+  for index, genre in enumerate(genres):
     query_count = Genre.query.filter_by(name=genre).count()
     if query_count == False:
       try:
-        new_genre = Genre(name=genre)
+        new_genre = Genre(id=index, name=genre)
         db.session.add(new_genre)
         db.session.commit()
       except Exception as e:
         error_logger(e, 'Error in genre seeding')
         db.session.rollback()
       finally:
+        genre_dict[index] = genre
         db.session.close()
     
   #  Venues
